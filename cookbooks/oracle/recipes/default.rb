@@ -42,11 +42,29 @@ package "sysstat"
 package "vte3"
 package "smartmontools"
 
+user 'vagrant' do
+  action :delete
+end
+
+user 'vagrant' do
+
+  action :create
+  password 'vagrant'
+end
+
+group 'oinstall' do
+  action :create
+  gid 54321
+  members 'vagrant'
+end
+
+group 'dba' do
+  action :create
+  gid 54322
+  members 'vagrant'
+end
 
 execute 'setup users and groups' do
-  command 'groupadd -g 54321 oinstall && groupadd -g 54322 dba'
-  command 'userdel vagrant && rm -rf /home/vagrant && rm /var/spool/mail/oracle'
-  command 'useradd -m -u 54321 -g oinstall -G dba vagrant'
   command 'echo "vagrant:vagrant" | chpasswd'
   ENV['CVUQDISK_GRP'] = "oinstall"
 end
@@ -62,7 +80,7 @@ execute 'extract oracle 12 2 of 2' do
 end
 
 directory '/u01/app/oracle' do
-  owner 'oracle'
+  owner 'vagrant'
   group 'oinstall'
   mode '0755'
   action :create
