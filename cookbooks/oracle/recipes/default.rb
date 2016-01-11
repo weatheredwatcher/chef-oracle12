@@ -43,6 +43,20 @@ package "vte3"
 package "smartmontools"
 
 
+execute 'setup users and groups' do
+  command 'groupadd -g 54321 oinstall && groupadd -g 54322 dba'
+  command 'userdel vagrant && rm -rf /home/vagrant && rm /var/spool/mail/oracle'
+  command 'useradd -m -u 54321 -g oinstall -G dba vagrant'
+  command 'echo "oracle:oracle" | chpasswd'
+end
+
+
+execute 'setup env' do
+
+  ENV['ORACLE_BASE'] = "/u01/app/oracle"
+  ENV['CVUQDISK_GRP'] = "oinstall"
+
+end
 execute 'extract oracle 12 1 of 2' do
   command 'unzip linuxamd64_12102_database_1of2.zip'
   cwd '/vagrant/manifest'
@@ -53,6 +67,30 @@ execute 'extract oracle 12 2 of 2' do
   cwd '/vagrant/manifest'
 end
 
+directory '/u01/app/oracle' do
+  owner 'oinstall'
+  group 'oinstall'
+  mode '0755'
+  action :create
+end
+
+directory '/u01/app/oraInventory' do
+  owner 'vagrant'
+  group 'root'
+  mode '0755'
+  action :create
+end
+
+
+file '/etc/oraInst.loc' do
+
+  action :create
+end
+
+file '/etc/security/limits.conf' do
+
+  content 'oracle soft stack 10240'
+end
 ## install RPM's
 
 execute 'Install RPMs' do
@@ -62,6 +100,10 @@ end
 
 ##install Oracle 12
 #
+
+file '/tmp/db_install.rsp' do
+  action :create
+end
 
 execute 'Install Oracle 12' do
   command './runInstaller -ignoreSysPrereqs -ignorePrereq -silent -noconfig -responseFile /tmp/db_install.rsp'
