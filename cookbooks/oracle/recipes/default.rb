@@ -64,9 +64,8 @@ group 'dba' do
   members 'vagrant'
 end
 
-execute 'setup users and groups' do
-  command 'echo "vagrant:vagrant" | chpasswd'
-  ENV['CVUQDISK_GRP'] = "oinstall"
+env 'CVUQDISK_GRP' do
+  value "oinstall"
 end
 
 execute 'extract oracle 12 1 of 2' do
