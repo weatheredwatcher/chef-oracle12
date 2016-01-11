@@ -43,10 +43,6 @@ package "vte3"
 package "smartmontools"
 
 user 'vagrant' do
-  action :delete
-end
-
-user 'vagrant' do
 
   action :create
   password 'vagrant'
@@ -64,9 +60,7 @@ group 'dba' do
   members 'vagrant'
 end
 
-env 'CVUQDISK_GRP' do
-  value "oinstall"
-end
+ENV['CVUQDISK_GRP']  = "oinstall"
 
 execute 'extract oracle 12 1 of 2' do
   command 'unzip linuxamd64_12102_database_1of2.zip'
@@ -82,6 +76,7 @@ directory '/u01/app/oracle' do
   owner 'vagrant'
   group 'oinstall'
   mode '0755'
+  recursive true
   action :create
 end
 
@@ -89,6 +84,7 @@ directory '/u01/app/oraInventory' do
   owner 'vagrant'
   group 'root'
   mode '0755'
+  recursive true
   action :create
 end
 
@@ -117,6 +113,7 @@ file '/tmp/db_install.rsp' do
 end
 
 execute 'Install Oracle 12' do
+  user "vagrant"
   command './runInstaller -ignoreSysPrereqs -ignorePrereq -silent -noconfig -responseFile /tmp/db_install.rsp'
   cwd '/vagrant/manifest/database'
 end
