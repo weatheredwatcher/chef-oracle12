@@ -47,16 +47,10 @@ execute 'setup users and groups' do
   command 'groupadd -g 54321 oinstall && groupadd -g 54322 dba'
   command 'userdel vagrant && rm -rf /home/vagrant && rm /var/spool/mail/oracle'
   command 'useradd -m -u 54321 -g oinstall -G dba vagrant'
-  command 'echo "oracle:oracle" | chpasswd'
-end
-
-
-execute 'setup env' do
-
-  ENV['ORACLE_BASE'] = "/u01/app/oracle"
+  command 'echo "vagrant:vagrant" | chpasswd'
   ENV['CVUQDISK_GRP'] = "oinstall"
-
 end
+
 execute 'extract oracle 12 1 of 2' do
   command 'unzip linuxamd64_12102_database_1of2.zip'
   cwd '/vagrant/manifest'
@@ -68,7 +62,7 @@ execute 'extract oracle 12 2 of 2' do
 end
 
 directory '/u01/app/oracle' do
-  owner 'oinstall'
+  owner 'oracle'
   group 'oinstall'
   mode '0755'
   action :create
